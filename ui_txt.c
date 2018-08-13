@@ -103,7 +103,7 @@ printstatus(Item *item, char c)
               "%3lld%%%*c %s/%c%s [%c]: ";
 	if (snprintf(bufout, sizeof(bufout), fmt,
 	             (printoff + lines-1 >= nitems) ? 100 :
-	             (printoff + lines) * 100 / nitems, ndigits(nitems)+2, '|',
+	             (printoff + lines) * 100 / nitems, ndigits(nitems)+1, '|',
 	             item->host, item->type, item->selector, c, item->port)
 	    >= sizeof(bufout))
 		bufout[sizeof(bufout)-1] = '\0';

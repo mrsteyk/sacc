@@ -19,7 +19,6 @@
 #include <sys/wait.h>
 
 #include "common.h"
-
 #include "config.h"
 
 static char *mainurl;
@@ -223,43 +222,43 @@ typedisplay(char t)
 {
 	switch (t) {
 	case '0':
-		return "Text+";
+		return typestr[TXT];
 	case '1':
-		return "Dir +";
+		return typestr[DIR];
 	case '2':
-		return "CSO |";
+		return typestr[CSO];
 	case '3':
-		return "Err |";
+		return typestr[ERR];
 	case '4':
-		return "Macf+";
+		return typestr[MAC];
 	case '5':
-		return "DOSf+";
+		return typestr[DOS];
 	case '6':
-		return "UUEf+";
+		return typestr[UUE];
 	case '7':
-		return "Find+";
+		return typestr[IND];
 	case '8':
-		return "Tlnt+";
+		return typestr[TLN];
 	case '9':
-		return "Binf+";
+		return typestr[BIN];
 	case '+':
-		return "Mirr+";
+		return typestr[MIR];
 	case 'T':
-		return "IBMt|";
+		return typestr[IBM];
 	case 'g':
-		return "GIF +";
+		return typestr[GIF];
 	case 'I':
-		return "Img +";
+		return typestr[IMG];
 	case 'h':
-		return "HTML+";
+		return typestr[URL];
 	case 'i':
-		return "    |";
+		return typestr[INF];
 	default:
 		/* "Characters '0' through 'Z' are reserved." (ASCII) */
 		if (t >= '0' && t <= 'Z')
-			return "!   |";
+			return typestr[BRK];
 		else
-			return "UNKN|";
+			return typestr[UNK];
 	}
 }
 

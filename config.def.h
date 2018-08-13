@@ -25,3 +25,25 @@ static char *plumber = "xdg-open";
 
 /* temporary directory template (must end with six 'X' characters) */
 static char tmpdir[] = "/tmp/sacc-XXXXXX";
+
+/* menu items strings */
+static char *typestr[] = {
+	[TXT] = "Txt+",
+	[DIR] = "Dir+",
+	[CSO] = "CSO|",
+	[ERR] = "Err|",
+	[MAC] = "Mac+",
+	[DOS] = "DOS+",
+	[UUE] = "UUE+",
+	[IND] = "Ind+",
+	[TLN] = "Tln|",
+	[BIN] = "Bin+",
+	[MIR] = "Mir+",
+	[IBM] = "IBM|",
+	[GIF] = "GIF+",
+	[IMG] = "Img+",
+	[URL] = "URL+",
+	[INF] = "   |",
+	[UNK] = " ? +",
+	[BRK] = "!  |", /* malformed entry */
+};

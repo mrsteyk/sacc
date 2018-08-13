@@ -3,6 +3,27 @@
 typedef struct item Item;
 typedef struct dir Dir;
 
+enum {
+	TXT,
+	DIR,
+	CSO,
+	ERR,
+	MAC,
+	DOS,
+	UUE,
+	IND,
+	TLN,
+	BIN,
+	MIR,
+	IBM,
+	GIF,
+	IMG,
+	URL,
+	INF,
+	UNK,
+	BRK,
+};
+
 struct item {
 	char type;
 	char redtype;
