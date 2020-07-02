@@ -951,6 +951,12 @@ cleanup(void)
 		uicleanup();
 }
 
+void
+sighandler(int signo)
+{
+	exit(128 + signo);
+}
+
 static void
 setup(void)
 {
@@ -971,7 +977,7 @@ setup(void)
 
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_RESTART;
-	sa.sa_handler = exit;
+	sa.sa_handler = sighandler;
 	sigaction(SIGINT, &sa, NULL);
 	sigaction(SIGHUP, &sa, NULL);
 	sigaction(SIGTERM, &sa, NULL);
