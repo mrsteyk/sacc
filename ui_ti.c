@@ -24,6 +24,8 @@ uisetup(void)
 	tcgetattr(0, &tsave);
 	tsacc = tsave;
 	tsacc.c_lflag &= ~(ECHO|ICANON);
+	tsacc.c_cc[VMIN] = 1;
+	tsacc.c_cc[VTIME] = 0;
 	tcsetattr(0, TCSANOW, &tsacc);
 
 	setupterm(NULL, 1, NULL);
