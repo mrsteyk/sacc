@@ -66,8 +66,7 @@ uiprompt(char *fmt, ...)
 	n = mbsprint(bufout, columns);
 
 	putp(tparm(exit_standout_mode, 0, 0, 0, 0, 0, 0, 0, 0, 0));
-	if (n < columns)
-		printf("%*s", columns - n, " ");
+	putp(tparm(clr_eol, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 
 	putp(tparm(cursor_address, lines-1, n, 0, 0, 0, 0, 0, 0, 0));
 
@@ -157,8 +156,7 @@ uistatus(char *fmt, ...)
 
 	n = mbsprint(bufout, columns);
 	putp(tparm(exit_standout_mode, 0, 0, 0, 0, 0, 0, 0, 0, 0));
-	if (n < columns)
-		printf("%*s", columns - n, " ");
+	putp(tparm(clr_eol, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 
 	putp(tparm(restore_cursor, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 	fflush(stdout);
@@ -188,8 +186,7 @@ displaystatus(Item *item)
 		bufout[sizeof(bufout)-1] = '\0';
 	n = mbsprint(bufout, columns);
 	putp(tparm(exit_standout_mode, 0, 0, 0, 0, 0, 0, 0, 0, 0));
-	if (n < columns)
-		printf("%*s", columns - n, " ");
+	putp(tparm(clr_eol, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 
 	putp(tparm(restore_cursor, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 	fflush(stdout);
@@ -243,8 +240,7 @@ displayuri(Item *item)
 
 	n = mbsprint(bufout, columns);
 	putp(tparm(exit_standout_mode, 0, 0, 0, 0, 0, 0, 0, 0, 0));
-	if (n < columns)
-		printf("%*s", columns - n, " ");
+	putp(tparm(clr_eol, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 
 	putp(tparm(restore_cursor, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 	fflush(stdout);
