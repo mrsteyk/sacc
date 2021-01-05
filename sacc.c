@@ -110,12 +110,18 @@ mbsprint(const char *s, size_t len)
 
 	slen = strlen(s);
 	for (i = 0; i < slen; i += rl) {
-		if ((rl = mbtowc(&wc, s + i, slen - i < 4 ? slen - i : 4)) <= 0)
-			break;
+		rl = mbtowc(&wc, s + i, slen - i < 4 ? slen - i : 4);
+		if (rl == -1) {
+			mbtowc(NULL, NULL, 0); /* reset state */
+			fputs("\xef\xbf\xbd", stdout); /* replacement character */
+			col++;
+			rl = 1;
+			continue;
+		}
 		if ((w = wcwidth(wc)) == -1)
 			continue;
 		if (col + w > len || (col + w == len && s[i + rl])) {
-			fputs("\xe2\x80\xa6", stdout);
+			fputs("\xe2\x80\xa6", stdout); /* ellipsis */
 			col++;
 			break;
 		}
