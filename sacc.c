@@ -132,7 +132,7 @@ mbsprint(const char *s, size_t len)
 }
 
 static void *
-xreallocarray(void *m, const size_t n, const size_t s)
+xreallocarray(void *m, size_t n, size_t s)
 {
 	void *nm;
 
