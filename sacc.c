@@ -103,7 +103,8 @@ mbsprint(const char *s, size_t len)
 {
 	wchar_t wc;
 	size_t col = 0, i, slen;
-	int rl, w;
+	const char *p;
+	int rl, pl, w;
 
 	if (!len)
 		return col;
@@ -112,20 +113,23 @@ mbsprint(const char *s, size_t len)
 	for (i = 0; i < slen; i += rl) {
 		rl = mbtowc(&wc, s + i, slen - i < 4 ? slen - i : 4);
 		if (rl == -1) {
-			mbtowc(NULL, NULL, 0); /* reset state */
-			fputs("\xef\xbf\xbd", stdout); /* replacement character */
-			col++;
-			rl = 1;
-			continue;
+			/* reset state */
+			mbtowc(NULL, NULL, 0);
+			p = "\xef\xbf\xbd"; /* replacement character */
+			pl = 3;
+			rl = w = 1;
+		} else {
+			if ((w = wcwidth(wc)) == -1)
+				continue;
+			pl = rl;
+			p = s + i;
 		}
-		if ((w = wcwidth(wc)) == -1)
-			continue;
 		if (col + w > len || (col + w == len && s[i + rl])) {
 			fputs("\xe2\x80\xa6", stdout); /* ellipsis */
 			col++;
 			break;
 		}
-		fwrite(s + i, 1, rl, stdout);
+		fwrite(p, 1, pl, stdout);
 		col += w;
 	}
 	return col;
