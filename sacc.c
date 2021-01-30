@@ -599,20 +599,25 @@ cleanup:
 static int
 fetchitem(Item *item)
 {
+	char *raw, *r;
 	int sock;
 
 	if ((sock = connectto(item->host, item->port)) < 0 ||
 	    sendselector(sock, item->selector) < 0)
 		return 0;
-	item->raw = getrawitem(sock);
+	raw = getrawitem(sock);
 	close(sock);
 
-	if (item->raw && !*item->raw) {
+	if (raw == NULL || !*raw) {
 		diag("Empty response from server");
-		clear(&item->raw);
+		clear(&raw);
+	} else if ((r = strrchr(raw, '.')) == NULL || strcmp(r, ".\r\n")) {
+		diag("Incomplete response from server");
+	} else {
+		*r = '\0';
 	}
 
-	return (item->raw != NULL);
+	return ((item->raw = raw) != NULL);
 }
 
 static void
