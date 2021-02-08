@@ -377,8 +377,6 @@ molddiritem(char *raw)
 		s = nl;
 		nl = p+1;
 	}
-	if (!strcmp(s, ".\r\n") || !strcmp(s, ".\n"))
-		--nitems;
 	if (!nitems) {
 		diag("Couldn't parse dir item");
 		return NULL;
@@ -421,6 +419,17 @@ getrawitem(int sock)
 	do {
 		bs -= n;
 		buf += n;
+
+		if (buf - raw >= 5) {
+			if (strncmp(buf-5, "\r\n.\r\n", 5) == 0) {
+				buf[-3] = '\0';
+				break;
+			}
+		} else if (buf - raw == 3 && strncmp(buf-3, ".\r\n", 3)) {
+			buf[-3] = '\0';
+			break;
+		}
+
 		if (bs < 1) {
 			raw = xreallocarray(raw, ++bn, BUFSIZ);
 			buf = raw + (bn-1) * BUFSIZ;
@@ -611,10 +620,6 @@ fetchitem(Item *item)
 	if (raw == NULL || !*raw) {
 		diag("Empty response from server");
 		clear(&raw);
-	} else if ((r = strrchr(raw, '.')) == NULL || strcmp(r, ".\r\n")) {
-		diag("Incomplete response from server");
-	} else {
-		*r = '\0';
 	}
 
 	return ((item->raw = raw) != NULL);
