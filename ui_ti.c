@@ -13,10 +13,19 @@
 #define C(c) #c
 #define S(c) C(c)
 
+/* ncurses doesn't define those in term.h, where they're used */
+#ifndef OK
+#define OK (0)
+#endif
+#ifndef ERR
+#define ERR (-1)
+#endif
+
 static char bufout[256];
 static struct termios tsave;
 static struct termios tsacc;
 static Item *curentry;
+static int termset = ERR;
 
 void
 uisetup(void)
@@ -28,7 +37,9 @@ uisetup(void)
 	tsacc.c_cc[VTIME] = 0;
 	tcsetattr(0, TCSANOW, &tsacc);
 
-	setupterm(NULL, 1, NULL);
+	if (termset != OK)
+		/* setupterm call exits on error */
+		termset = setupterm(NULL, 1, NULL);
 	putp(tparm(clear_screen, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 	putp(tparm(save_cursor, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 	putp(tparm(change_scroll_region, 0, lines-2, 0, 0, 0, 0, 0, 0, 0));
@@ -39,6 +50,9 @@ uisetup(void)
 void
 uicleanup(void)
 {
+	if (termset != OK)
+		return;
+
 	putp(tparm(change_scroll_region, 0, lines-1, 0, 0, 0, 0, 0, 0, 0));
 	putp(tparm(clear_screen, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 	tcsetattr(0, TCSANOW, &tsave);
@@ -565,7 +579,9 @@ uisigwinch(int signal)
 {
 	Dir *dir;
 
-	setupterm(NULL, 1, NULL);
+	if (termset == OK)
+		del_curterm(cur_term);
+	termset = setupterm(NULL, 1, NULL);
 	putp(tparm(change_scroll_region, 0, lines-2, 0, 0, 0, 0, 0, 0, 0));
 
 	if (!curentry || !(dir = curentry->dat))
