@@ -50,12 +50,13 @@ uisetup(void)
 void
 uicleanup(void)
 {
+	tcsetattr(0, TCSANOW, &tsave);
+
 	if (termset != OK)
 		return;
 
 	putp(tparm(change_scroll_region, 0, lines-1, 0, 0, 0, 0, 0, 0, 0));
 	putp(tparm(clear_screen, 0, 0, 0, 0, 0, 0, 0, 0, 0));
-	tcsetattr(0, TCSANOW, &tsave);
 	fflush(stdout);
 }
 
