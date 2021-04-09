@@ -20,7 +20,7 @@ viewsize(int *ln, int *col)
 {
 	struct winsize ws;
 
-	if (ioctl(1, TIOCGWINSZ, &ws) < 0) {
+	if (ioctl(1, TIOCGWINSZ, &ws) == -1) {
 		die("Could not get terminal resolution: %s",
 		    strerror(errno));
 	}
@@ -126,7 +126,7 @@ uiprompt(char *fmt, ...)
 	mbsprint(bufout, columns);
 	fflush(stdout);
 
-	if ((r = getline(&input, &n, stdin)) < 0) {
+	if ((r = getline(&input, &n, stdin)) == -1) {
 		clearerr(stdin);
 		clear(&input);
 		putchar('\n');

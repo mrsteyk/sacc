@@ -472,7 +472,7 @@ getrawitem(struct cnx *cnx)
 
 	*buf = '\0';
 
-	if (n < 0) {
+	if (n == -1) {
 		diag("Can't read socket: %s", strerror(errno));
 		clear(&raw);
 	}
@@ -550,7 +550,7 @@ connectto(const char *host, const char *port, struct cnx *cnx)
 
 	for (addr = addrs; addr; addr = addr->ai_next) {
 		if ((sock = socket(addr->ai_family, addr->ai_socktype,
-		                   addr->ai_protocol)) < 0)
+		                   addr->ai_protocol)) == -1)
 			continue;
 
 		r = connect(sock, addr->ai_addr, addr->ai_addrlen);
@@ -574,11 +574,11 @@ connectto(const char *host, const char *port, struct cnx *cnx)
 
 	freeaddrinfo(addrs);
 
-	if (sock < 0) {
+	if (sock == -1) {
 		diag("Can't open socket: %s", strerror(errno));
 		goto err;
 	}
-	if (r < 0) {
+	if (r == -1) {
 		diag("Can't connect to: %s:%s: %s",
 		     host, port, strerror(errno));
 		goto err;
@@ -603,11 +603,11 @@ download(Item *item, int dest)
 	int src;
 
 	if (!item->tag) {
-		if (connectto(item->host, item->port, &cnx) < 0 ||
-		    sendselector(&cnx, item->selector) < 0)
+		if (connectto(item->host, item->port, &cnx) == -1 ||
+		    sendselector(&cnx, item->selector) == -1)
 			return 0;
 		src = cnx.sock;
-	} else if ((src = open(item->tag, O_RDONLY)) < 0) {
+	} else if ((src = open(item->tag, O_RDONLY)) == -1) {
 		printf("Can't open source file %s: %s",
 		       item->tag, strerror(errno));
 		errno = 0;
@@ -632,7 +632,7 @@ download(Item *item, int dest)
 			r -= w;
 	}
 
-	if (r < 0 || w < 0) {
+	if (r == -1 || w == -1) {
 		printf("Error downloading file %s: %s",
 		       item->selector, strerror(errno));
 		errno = 0;
@@ -662,14 +662,14 @@ downloaditem(Item *item)
 		path = xstrdup(file);
 
 	if (tag = item->tag) {
-		if (access(tag, R_OK) < 0) {
+		if (access(tag, R_OK) == -1) {
 			clear(&item->tag);
 		} else if (!strcmp(tag, path)) {
 			goto cleanup;
 		}
 	}
 
-	if ((dest = open(path, O_WRONLY|O_CREAT|O_EXCL, mode)) < 0) {
+	if ((dest = open(path, O_WRONLY|O_CREAT|O_EXCL, mode)) == -1) {
 		diag("Can't open destination file %s: %s",
 		     path, strerror(errno));
 		errno = 0;
@@ -696,8 +696,8 @@ fetchitem(Item *item)
 	struct cnx cnx;
 	char *raw;
 
-	if (connectto(item->host, item->port, &cnx) < 0 ||
-	    sendselector(&cnx, item->selector) < 0)
+	if (connectto(item->host, item->port, &cnx) == -1 ||
+	    sendselector(&cnx, item->selector) == -1)
 		return 0;
 
 	raw = getrawitem(&cnx);
@@ -722,7 +722,7 @@ plumb(char *url)
 		parent = 0;
 		dup2(devnullfd, 1);
 		dup2(devnullfd, 2);
-		if (execlp(plumber, plumber, url, NULL) < 0)
+		if (execlp(plumber, plumber, url, NULL) == -1)
 			_exit(1);
 	}
 
@@ -746,7 +746,7 @@ plumbitem(Item *item)
 	if (!path)
 		return;
 
-	if ((tag = item->tag) && access(tag, R_OK) < 0) {
+	if ((tag = item->tag) && access(tag, R_OK) == -1) {
 		clear(&item->tag);
 		tag = NULL;
 	}
@@ -756,14 +756,14 @@ plumbitem(Item *item)
 	if (!path[0]) {
 		clear(&path);
 		if (!tag) {
-			if (asprintf(&path, "%s/%s", tmpdir, file) < 0)
+			if (asprintf(&path, "%s/%s", tmpdir, file) == -1)
 				die("Can't generate tmpdir path: %s/%s: %s",
 				    tmpdir, file, strerror(errno));
 		}
 	}
 
 	if (path && (!tag || strcmp(tag, path))) {
-		if ((dest = open(path, O_WRONLY|O_CREAT|O_EXCL, mode)) < 0) {
+		if ((dest = open(path, O_WRONLY|O_CREAT|O_EXCL, mode)) == -1) {
 			diag("Can't open destination file %s: %s",
 			     path, strerror(errno));
 			errno = 0;
@@ -821,7 +821,7 @@ dig(Item *entry, Item *item)
 	case '8':
 		if (asprintf(&plumburi, "telnet://%s%s%s:%s",
 		             item->selector, item->selector ? "@" : "",
-		             item->host, item->port) < 0)
+		             item->host, item->port) == -1)
 			return 0;
 		plumb(plumburi);
 		free(plumburi);
@@ -829,7 +829,7 @@ dig(Item *entry, Item *item)
 	case 'T':
 		if (asprintf(&plumburi, "tn3270://%s%s%s:%s",
 		             item->selector, item->selector ? "@" : "",
-		             item->host, item->port) < 0)
+		             item->host, item->port) == -1)
 			return 0;
 		plumb(plumburi);
 		free(plumburi);
@@ -1081,12 +1081,12 @@ setup(void)
 	setenv("PAGER", "more", 0);
 	atexit(cleanup);
 	/* reopen stdin in case we're reading from a pipe */
-	if ((fd = open("/dev/tty", O_RDONLY)) < 0)
+	if ((fd = open("/dev/tty", O_RDONLY)) == -1)
 		die("open: /dev/tty: %s", strerror(errno));
-	if (dup2(fd, 0) < 0)
+	if (dup2(fd, 0) == -1)
 		die("dup2: /dev/tty, stdin: %s", strerror(errno));
 	close(fd);
-	if ((devnullfd = open("/dev/null", O_WRONLY)) < 0)
+	if ((devnullfd = open("/dev/null", O_WRONLY)) == -1)
 		die("open: /dev/null: %s", strerror(errno));
 
 	sigemptyset(&sa.sa_mask);

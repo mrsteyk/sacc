@@ -97,7 +97,7 @@ uiprompt(char *fmt, ...)
 	putp(tparm(restore_cursor, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 	fflush(stdout);
 
-	if (r < 0) {
+	if (r == -1) {
 		clearerr(stdin);
 		clear(&input);
 	} else if (input[r - 1] == '\n') {
