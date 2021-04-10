@@ -978,7 +978,7 @@ cleanup(void)
 		uicleanup();
 }
 
-void
+static void
 sighandler(int signo)
 {
 	exit(128 + signo);
