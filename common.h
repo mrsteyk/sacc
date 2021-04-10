@@ -44,6 +44,7 @@ struct dir {
 	size_t curline;
 };
 
+extern void (*diag)(char *fmt, ...);
 void die(const char *fmt, ...);
 size_t mbsprint(const char *s, size_t len);
 #ifdef NEED_STRCASESTR

@@ -28,9 +28,9 @@ static int devnullfd;
 static int parent = 1;
 static int interactive;
 
-static void (*diag)(char *fmt, ...);
+void (*diag)(char *fmt, ...);
 
-void
+static void
 stddiag(char *fmt, ...)
 {
 	va_list arg;
@@ -1013,8 +1013,11 @@ setup(void)
 		die("mkdir: %s: %s", tmpdir, strerror(errno));
 	if(interactive = isatty(1)) {
 		uisetup();
+		diag = uistatus;
 		sa.sa_handler = uisigwinch;
 		sigaction(SIGWINCH, &sa, NULL);
+	} else {
+		diag = stddiag;
 	}
 }
 
@@ -1027,15 +1030,12 @@ main(int argc, char *argv[])
 	setup();
 
 	mainurl = xstrdup(argv[1]);
-
 	mainentry = moldentry(mainurl);
-	if (interactive) {
-		diag = uistatus;
+
+	if (interactive)
 		delve(mainentry);
-	} else {
-		diag = stddiag;
+	else
 		printout(mainentry);
-	}
 
 	exit(0);
 }
