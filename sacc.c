@@ -18,26 +18,15 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#ifdef USE_TLS
-#include <tls.h>
-#endif
-
 #include "common.h"
+#include "io.h"
 #include "config.h"
-
-struct cnx {
-#ifdef USE_TLS
-	struct tls *tls;
-#endif
-	int sock;
-};
 
 static char *mainurl;
 static Item *mainentry;
 static int devnullfd;
 static int parent = 1;
 static int interactive;
-static int tls;
 
 static void (*diag)(char *fmt, ...);
 
@@ -429,7 +418,7 @@ molddiritem(char *raw)
 }
 
 static char *
-getrawitem(struct cnx *cnx)
+getrawitem(struct cnx *c)
 {
 	char *raw, *buf;
 	size_t bn, bs;
@@ -458,17 +447,7 @@ getrawitem(struct cnx *cnx)
 			bs = BUFSIZ;
 		}
 
-#ifdef USE_TLS
-		if (tls) {
-			do {
-				n = tls_read(cnx->tls, buf, bs);
-			} while (n == TLS_WANT_POLLIN || n == TLS_WANT_POLLOUT);
-		} else
-#endif
-		{
-			n = read(cnx->sock, buf, bs);
-		}
-	} while (n > 0);
+	} while ((n = ioread(c, buf, bs)) > 0);
 
 	*buf = '\0';
 
@@ -481,7 +460,7 @@ getrawitem(struct cnx *cnx)
 }
 
 static int
-sendselector(struct cnx *cnx, const char *selector)
+sendselector(struct cnx *c, const char *selector)
 {
 	char *msg, *p;
 	size_t ln;
@@ -491,21 +470,10 @@ sendselector(struct cnx *cnx, const char *selector)
 	msg = p = xmalloc(ln);
 	snprintf(msg, ln--, "%s\r\n", selector);
 
-	do {
-#ifdef USE_TLS
-		if (tls) {
-			do {
-				n = tls_write(cnx->tls, p, ln);
-			} while (n == TLS_WANT_POLLIN || n == TLS_WANT_POLLOUT);
-		} else
-#endif
-		{
-			n = write(cnx->sock, p, ln);
-		}
-
+	while ((n = iowrite(c, p, ln)) > 0) {
 		ln -= n;
 		p += n;
-	} while (n > 0);
+	};
 
 	free(msg);
 	if (n == -1)
@@ -514,20 +482,8 @@ sendselector(struct cnx *cnx, const char *selector)
 	return n;
 }
 
-static void
-closecnx(struct cnx *cnx)
-{
-#ifdef USE_TLS
-	if (tls) {
-		tls_close(cnx->tls);
-		tls_free(cnx->tls);
-	}
-#endif
-	close(cnx->sock);
-}
-
 static int
-connectto(const char *host, const char *port, struct cnx *cnx)
+connectto(const char *host, const char *port, struct cnx *c)
 {
 	sigset_t set, oset;
 	static const struct addrinfo hints = {
@@ -536,7 +492,7 @@ connectto(const char *host, const char *port, struct cnx *cnx)
 	    .ai_protocol = IPPROTO_TCP,
 	};
 	struct addrinfo *addrs, *addr;
-	int r, sock = -1;
+	int r, err;
 
 	sigemptyset(&set);
 	sigaddset(&set, SIGWINCH);
@@ -548,86 +504,54 @@ connectto(const char *host, const char *port, struct cnx *cnx)
 		goto err;
 	}
 
+	r = -1;
 	for (addr = addrs; addr; addr = addr->ai_next) {
-		if ((sock = socket(addr->ai_family, addr->ai_socktype,
-		                   addr->ai_protocol)) == -1)
+		if ((c->sock = socket(addr->ai_family, addr->ai_socktype,
+		                      addr->ai_protocol)) == -1) {
+			err = errno;
 			continue;
+		}
 
-		r = connect(sock, addr->ai_addr, addr->ai_addrlen);
-		if (r == -1) {
-			close(sock);
-			continue;
-		}
-#ifdef USE_TLS
-		if (tls) {
-			if ((cnx->tls = tls_client()) == NULL) {
-				diag("Can't establish TLS with \"%s\": %s",
-				     host, tls_error(cnx->tls));
-				close(sock);
-				continue;
-			}
-			r = tls_connect_socket(cnx->tls, sock, host);
-		}
-#endif
-		break;
+		if ((r = ioconnect(c, addr, host)) == 0)
+			break;
+
+		err = errno;
+		close(c->sock);
 	}
 
 	freeaddrinfo(addrs);
 
-	if (sock == -1) {
-		diag("Can't open socket: %s", strerror(errno));
-		goto err;
-	}
-	if (r == -1) {
-		diag("Can't connect to: %s:%s: %s",
-		     host, port, strerror(errno));
-		goto err;
-	}
-
-	sigprocmask(SIG_SETMASK, &oset, NULL);
-
-	cnx->sock = sock;
-
-	return 0;
+	if (r == -1)
+		ioconnerr(c, host, port, err);
 err:
 	sigprocmask(SIG_SETMASK, &oset, NULL);
-	return -1;
+
+	return r;
 }
 
 static int
 download(Item *item, int dest)
 {
 	char buf[BUFSIZ];
-	struct cnx cnx;
+	struct cnx c;
 	ssize_t r, w;
-	int src;
 
-	if (!item->tag) {
-		if (connectto(item->host, item->port, &cnx) == -1 ||
-		    sendselector(&cnx, item->selector) == -1)
+	if (item->tag == NULL) {
+		if (connectto(item->host, item->port, &c) == -1 ||
+		    sendselector(&c, item->selector) == -1)
 			return 0;
-		src = cnx.sock;
-	} else if ((src = open(item->tag, O_RDONLY)) == -1) {
-		printf("Can't open source file %s: %s",
-		       item->tag, strerror(errno));
-		errno = 0;
-		return 0;
+	} else {
+		if ((c.sock = open(item->tag, O_RDONLY)) == -1) {
+			printf("Can't open source file %s: %s",
+			       item->tag, strerror(errno));
+			errno = 0;
+			return 0;
+		}
+		c.tls = NULL;
 	}
 
-	for (w = 0; w != -1;) {
-#ifdef USE_TLS
-		if (tls) {
-			do {
-				r = tls_read(cnx.tls, buf, sizeof(buf));
-			} while (r == TLS_WANT_POLLIN || r == TLS_WANT_POLLOUT);
-		} else
-#endif
-		{
-			r = read(src, buf, sizeof(buf));
-		}
-		if (r <= 0)
-			break;
-
+	w = 0;
+	while ((r = ioread(&c, buf, BUFSIZ)) > 0) {
 		while ((w = write(dest, buf, r)) > 0)
 			r -= w;
 	}
@@ -638,7 +562,8 @@ download(Item *item, int dest)
 		errno = 0;
 	}
 
-	closecnx(&cnx);
+	close(dest);
+	ioclose(&c);
 
 	return (r == 0 && w == 0);
 }
@@ -693,15 +618,15 @@ cleanup:
 static int
 fetchitem(Item *item)
 {
-	struct cnx cnx;
+	struct cnx c;
 	char *raw;
 
-	if (connectto(item->host, item->port, &cnx) == -1 ||
-	    sendselector(&cnx, item->selector) == -1)
+	if (connectto(item->host, item->port, &c) == -1 ||
+	    sendselector(&c, item->selector) == -1)
 		return 0;
 
-	raw = getrawitem(&cnx);
-	closecnx(&cnx);
+	raw = getrawitem(&c);
+	ioclose(&c);
 
 	if (raw == NULL || !*raw) {
 		diag("Empty response from server");
@@ -985,19 +910,7 @@ moldentry(char *url)
 	char *p, *host = url, *port = "70", *gopherpath = "1";
 	int parsed, ipv6;
 
-	if (p = strstr(url, "://")) {
-		if (strncmp(url, "gopher", p - url) == 0) {
-			if (tls) {
-				diag("Switching from gophers to gopher");
-				tls = 0;
-			}
-		} else if (strncmp(url, "gophers", p - url) == 0) {
-			tls = 1;
-		} else {
-			die("Protocol not supported: %.*s", p - url, url);
-		}
-		host = p + 3;
-	}
+	host = ioparseurl(url);
 
 	if (*host == '[') {
 		ipv6 = 1;

@@ -6,7 +6,7 @@ include config.mk
 
 BIN = sacc
 MAN = $(BIN).1
-OBJ = $(BIN:=.o) ui_$(UI).o
+OBJ = $(BIN:=.o) ui_$(UI).o io_$(IO).o
 
 all: $(BIN)
 
@@ -14,9 +14,9 @@ config.h:
 	cp config.def.h config.h
 
 $(BIN): $(OBJ)
-	$(CC) $(OBJ) $(LDFLAGS) $(LIBS) $(TLSLIBS) -o $@
+	$(CC) $(OBJ) $(LDFLAGS) $(IOLIBS) $(LIBS) -o $@
 
-$(OBJ): config.h config.mk common.h
+$(OBJ): config.h config.mk common.h io.h
 
 clean:
 	rm -f $(BIN) $(OBJ)
@@ -33,7 +33,7 @@ uninstall:
 
 # Stock FLAGS
 SACCCFLAGS = -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700 -D_BSD_SOURCE -D_GNU_SOURCE \
-             $(TLSCFLAGS) $(CFLAGS)
+             $(IOCFLAGS) $(CFLAGS)
 
 .c.o:
 	$(CC) $(SACCCFLAGS) -c $<
