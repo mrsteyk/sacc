@@ -1011,7 +1011,7 @@ setup(void)
 
 	if (!mkdtemp(tmpdir))
 		die("mkdir: %s: %s", tmpdir, strerror(errno));
-	if(interactive = isatty(1)) {
+	if (interactive = isatty(1)) {
 		uisetup();
 		diag = uistatus;
 		sa.sa_handler = uisigwinch;
