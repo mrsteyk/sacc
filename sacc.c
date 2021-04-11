@@ -491,8 +491,8 @@ connectto(const char *host, const char *port, struct cnx *c)
 	    .ai_socktype = SOCK_STREAM,
 	    .ai_protocol = IPPROTO_TCP,
 	};
-	struct addrinfo *addrs, *addr;
-	int r, err;
+	struct addrinfo *addrs, *ai;
+	int r, err, conn;
 
 	sigemptyset(&set);
 	sigaddset(&set, SIGWINCH);
@@ -505,18 +505,20 @@ connectto(const char *host, const char *port, struct cnx *c)
 	}
 
 	r = -1;
-	for (addr = addrs; addr; addr = addr->ai_next) {
-		if ((c->sock = socket(addr->ai_family, addr->ai_socktype,
-		                      addr->ai_protocol)) == -1) {
-			err = errno;
-			continue;
-		}
+	for (ai = addrs; ai && r == -1; ai = ai->ai_next) {
+		do {
+			if ((c->sock = socket(ai->ai_family, ai->ai_socktype,
+			                      ai->ai_protocol)) == -1) {
+				err = errno;
+				break;
+			}
 
-		if ((r = ioconnect(c, addr, host)) == 0)
-			break;
-
-		err = errno;
-		close(c->sock);
+			if ((r = ioconnect(c, ai, host)) < 0) {
+				err = errno;
+				ioclose(c);
+			}
+		/* retry on cleartext */
+		} while (r == -2);
 	}
 
 	freeaddrinfo(addrs);
@@ -537,7 +539,7 @@ download(Item *item, int dest)
 	ssize_t r, w;
 
 	if (item->tag == NULL) {
-		if (connectto(item->host, item->port, &c) == -1 ||
+		if (connectto(item->host, item->port, &c) < 0 ||
 		    sendselector(&c, item->selector) == -1)
 			return 0;
 	} else {
@@ -621,7 +623,7 @@ fetchitem(Item *item)
 	struct cnx c;
 	char *raw;
 
-	if (connectto(item->host, item->port, &c) == -1 ||
+	if (connectto(item->host, item->port, &c) < 0 ||
 	    sendselector(&c, item->selector) == -1)
 		return 0;
 

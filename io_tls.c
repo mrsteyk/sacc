@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <netdb.h>
@@ -32,6 +33,7 @@ static int
 connect_tls(struct cnx *c, struct addrinfo *ai, const char *host)
 {
 	struct tls *t;
+	char *r;
 	int s;
 
 	c->tls = NULL;
@@ -43,13 +45,34 @@ connect_tls(struct cnx *c, struct addrinfo *ai, const char *host)
 	if (tls) {
 		if ((t = tls_client()) == NULL)
 			return -1;
-		if (tls_connect_socket(t, s, host) == -1)
-			return -1;
-
-		c->tls = t;
+		if (tls_connect_socket(t, s, host) == 0) {
+			do {
+				s = tls_handshake(t);
+			} while (s == TLS_WANT_POLLIN || s == TLS_WANT_POLLOUT);
+			if (s == 0) {
+				c->tls = t;
+			} else {
+				diag("Can't establish TLS with \"%s\": %s",
+				     host, tls_error(t));
+				r = uiprompt("Retry on cleartext? [Yn]: ");
+				switch (*r) {
+				case 'Y':
+				case 'y':
+				case '\0':
+					tls = 0;
+					s = -2;
+					break;
+				default:
+					s = -3;
+				}
+				free(r);
+			}
+		} else {
+			s = -1;
+		}
 	}
 
-	return 0;
+	return s;
 }
 
 static void
