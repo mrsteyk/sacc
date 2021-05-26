@@ -285,10 +285,17 @@ printdir(Item *item)
 static void
 displaytextitem(Item *item)
 {
+	struct sigaction sa;
 	FILE *pagerin;
 	int pid, wpid;
 
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART;
+	sa.sa_handler = SIG_DFL;
+	sigaction(SIGWINCH, &sa, NULL);
+
 	uicleanup();
+
 	switch (pid = fork()) {
 	case -1:
 		diag("Couldn't fork.");
@@ -304,6 +311,10 @@ displaytextitem(Item *item)
 			;
 	}
 	uisetup();
+
+	sa.sa_handler = uisigwinch;
+	sigaction(SIGWINCH, &sa, NULL);
+	uisigwinch(SIGWINCH); /* force redraw */
 }
 
 static char *
