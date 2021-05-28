@@ -589,7 +589,7 @@ uisigwinch(int signal)
 		return;
 
 	if (dir->curline - dir->printoff > lines-2)
-		dir->curline = dir->printoff + lines-2;
+		dir->printoff = dir->curline - (lines-2);
 
 	uidisplay(curentry);
 }
