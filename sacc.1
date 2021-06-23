@@ -13,7 +13,7 @@ hierarchical information. The protocol is defined in
 (Gopher).
 .SH SHORTCUTS
 Shortcuts can be redefined in the
-.I config.h.
+.BR config.h .
 The manpage is showing the default shortcuts.
 .TP
 .B Down or j
@@ -70,30 +70,38 @@ Show the help message of shortcuts.
 .B ^D or q
 Exit sacc.
 .SH ENVIRONMENT
-Sacc will use the pager set in the
+.B sacc
+will use the pager set in the
 .B PAGER
 variable to display textual content.
-If unset, it'll try to use more(1).
+If unset, it'll try to use
+.BR more (1).
 Note that sacc takes back control of the screen
 as soon as the pager finishes.
 In case of doubt,
 read your pager documentation.
 .SH PLUMBER
 When some file is opened
-.I sacc
+.B sacc
 cannot open natively, it will run
-.I xdg-open.
+.BR xdg-open .
 This can be configured in the
-.I config.h
+.B config.h
 to run some other plumber.
 .SH CUSTOMIZATION
 .B sacc
-can be customized by creating a custom config.h and (re)compiling the source
+can be customized by creating a custom
+.B config.h
+and (re)compiling the source
 code. This keeps it fast, secure and simple.
 .SH AUTHORS
-See the LICENSE file for the authors.
+See the
+.B LICENSE
+file for the authors.
 .SH LICENSE
-See the LICENSE file for the terms of redistribution.
+See the
+.B LICENSE
+file for the terms of redistribution.
 .SH SEE ALSO
 .BR more (1)
 .BR xdg-open (1)
