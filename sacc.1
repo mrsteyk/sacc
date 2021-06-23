@@ -73,8 +73,11 @@ Exit sacc.
 Sacc will use the pager set in the
 .B PAGER
 variable to display textual content.
+If unset, it'll try to use more(1).
 Note that sacc takes back control of the screen
 as soon as the pager finishes.
+In case of doubt,
+read your pager documentation.
 .SH PLUMBER
 When some file is opened
 .I sacc
@@ -92,8 +95,9 @@ See the LICENSE file for the authors.
 .SH LICENSE
 See the LICENSE file for the terms of redistribution.
 .SH SEE ALSO
-.BR geomyidae (8),
-.BR clic (1),
+.BR more (1)
 .BR xdg-open (1)
+.BR geomyidae (8)
+.BR clic (1)
 .SH BUGS
 Please report them to Quentin Rameau <quinq@fifth.space>
