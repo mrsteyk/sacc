@@ -100,10 +100,10 @@ printstatus(Item *item, char c)
 
 	fmt = (strcmp(item->port, "70") && strcmp(item->port, "gopher")) ?
 	      "%1$3lld%%%*2$3$c %4$s:%8$s/%5$c%6$s [%7$c]: " :
-              "%3lld%%%*c %s/%c%s [%c]: ";
+              "%3lld%% %s/%c%s [%c]: ";
 	if (snprintf(bufout, sizeof(bufout), fmt,
 	             (printoff + lines-1 >= nitems) ? 100 :
-	             (printoff + lines) * 100 / nitems, ndigits(nitems)+1, '|',
+	             (printoff + lines) * 100 / nitems,
 	             item->host, item->type, item->selector, c, item->port)
 	    >= sizeof(bufout))
 		bufout[sizeof(bufout)-1] = '\0';
