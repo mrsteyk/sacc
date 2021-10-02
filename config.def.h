@@ -23,6 +23,9 @@
 /* default plumber */
 static char *plumber = "xdg-open";
 
+/* modal plumber will make sacc wait for the plumber to return */
+static int modalplumber = 0;
+
 /* temporary directory template (must end with six 'X' characters) */
 static char tmpdir[] = "/tmp/sacc-XXXXXX";
 

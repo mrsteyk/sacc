@@ -651,6 +651,11 @@ plumb(char *url)
 		dup2(devnullfd, 2);
 		if (execlp(plumber, plumber, url, NULL) == -1)
 			_exit(1);
+	default:
+		if (modalplumber) {
+			while (waitpid(-1, NULL, 0) != -1)
+				;
+		}
 	}
 
 	diag("Plumbed \"%s\"", url);
