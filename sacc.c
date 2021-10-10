@@ -22,6 +22,8 @@
 #include "io.h"
 #include "config.h"
 
+const char ident[] = "@(#) sacc(omys): " VERSION;
+
 static char *mainurl;
 static Item *mainentry;
 static int devnullfd;
