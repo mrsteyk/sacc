@@ -75,9 +75,9 @@ uiprompt(char *fmt, ...)
 	putp(tparm(enter_standout_mode, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 
 	va_start(ap, fmt);
-	if (vsnprintf(bufout, sizeof(bufout), fmt, ap) >= sizeof(bufout))
-		bufout[sizeof(bufout)-1] = '\0';
+	vsnprintf(bufout, sizeof(bufout), fmt, ap);
 	va_end(ap);
+
 	n = mbsprint(bufout, columns);
 
 	putp(tparm(exit_standout_mode, 0, 0, 0, 0, 0, 0, 0, 0, 0));
@@ -110,9 +110,9 @@ uiprompt(char *fmt, ...)
 static void
 printitem(Item *item)
 {
-	if (snprintf(bufout, sizeof(bufout), "%s %s", typedisplay(item->type),
-	    item->username) >= sizeof(bufout))
-		bufout[sizeof(bufout)-1] = '\0';
+	snprintf(bufout, sizeof(bufout), "%s %s",
+	         typedisplay(item->type), item->username);
+
 	mbsprint(bufout, columns);
 	putchar('\r');
 }
@@ -163,13 +163,12 @@ uistatus(char *fmt, ...)
 	va_end(ap);
 
 	if (n < sizeof(bufout)-1) {
-		n += snprintf(bufout + n, sizeof(bufout) - n,
-		              " [Press a key to continue \xe2\x98\x83]");
+		snprintf(bufout+n, sizeof(bufout)-n,
+		         " [Press a key to continue \xe2\x98\x83]");
 	}
-	if (n >= sizeof(bufout))
-		bufout[sizeof(bufout)-1] = '\0';
 
-	n = mbsprint(bufout, columns);
+	mbsprint(bufout, columns);
+
 	putp(tparm(exit_standout_mode, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 	putp(tparm(clr_eol, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 
@@ -184,22 +183,23 @@ displaystatus(Item *item)
 {
 	Dir *dir = item->dat;
 	char *fmt;
-	size_t n, nitems = dir ? dir->nitems : 0;
+	size_t nitems = dir ? dir->nitems : 0;
 	unsigned long long printoff = dir ? dir->printoff : 0;
 
 	putp(tparm(save_cursor, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 
 	putp(tparm(cursor_address, lines-1, 0, 0, 0, 0, 0, 0, 0, 0));
 	putp(tparm(enter_standout_mode, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+
 	fmt = (strcmp(item->port, "70") && strcmp(item->port, "gopher")) ?
 	      "%1$3lld%%| %2$s:%5$s/%3$c%4$s" : "%3lld%%| %s/%c%s";
-	if (snprintf(bufout, sizeof(bufout), fmt,
-	             (printoff + lines-1 >= nitems) ? 100 :
-	             (printoff + lines-1) * 100 / nitems,
-	             item->host, item->type, item->selector, item->port)
-	    >= sizeof(bufout))
-		bufout[sizeof(bufout)-1] = '\0';
-	n = mbsprint(bufout, columns);
+	snprintf(bufout, sizeof(bufout), fmt,
+	         (printoff + lines-1 >= nitems) ? 100 :
+	         (printoff + lines-1) * 100 / nitems,
+	         item->host, item->type, item->selector, item->port);
+
+	mbsprint(bufout, columns);
+
 	putp(tparm(exit_standout_mode, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 	putp(tparm(clr_eol, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 
@@ -210,8 +210,6 @@ displaystatus(Item *item)
 static void
 displayuri(Item *item)
 {
-	size_t n;
-
 	if (item->type == 0 || item->type == 'i')
 		return;
 
@@ -222,10 +220,8 @@ displayuri(Item *item)
 
 	itemuri(item, bufout, sizeof(bufout));
 
-	if (n >= sizeof(bufout))
-		bufout[sizeof(bufout)-1] = '\0';
+	mbsprint(bufout, columns);
 
-	n = mbsprint(bufout, columns);
 	putp(tparm(exit_standout_mode, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 	putp(tparm(clr_eol, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 

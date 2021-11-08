@@ -78,11 +78,9 @@ uistatus(char *fmt, ...)
 	va_end(arg);
 
 	if (n < sizeof(bufout)-1) {
-		n += snprintf(bufout + n, sizeof(bufout) - n,
-		              " [Press Enter to continue \xe2\x98\x83]");
+		snprintf(bufout+n, sizeof(bufout)-n,
+		         " [Press Enter to continue \xe2\x98\x83]");
 	}
-	if (n >= sizeof(bufout))
-		bufout[sizeof(bufout)-1] = '\0';
 
 	mbsprint(bufout, columns);
 	fflush(stdout);
@@ -101,12 +99,11 @@ printstatus(Item *item, char c)
 	fmt = (strcmp(item->port, "70") && strcmp(item->port, "gopher")) ?
 	      "%1$3lld%%%*2$3$c %4$s:%8$s/%5$c%6$s [%7$c]: " :
               "%3lld%% %s/%c%s [%c]: ";
-	if (snprintf(bufout, sizeof(bufout), fmt,
-	             (printoff + lines-1 >= nitems) ? 100 :
-	             (printoff + lines) * 100 / nitems,
-	             item->host, item->type, item->selector, c, item->port)
-	    >= sizeof(bufout))
-		bufout[sizeof(bufout)-1] = '\0';
+	snprintf(bufout, sizeof(bufout), fmt,
+	         (printoff + lines-1 >= nitems) ? 100 :
+	         (printoff + lines) * 100 / nitems,
+	         item->host, item->type, item->selector, c, item->port);
+
 	mbsprint(bufout, columns);
 }
 
@@ -119,8 +116,7 @@ uiprompt(char *fmt, ...)
 	ssize_t r;
 
 	va_start(ap, fmt);
-	if (vsnprintf(bufout, sizeof(bufout), fmt, ap) >= sizeof(bufout))
-		bufout[sizeof(bufout)-1] = '\0';
+	vsnprintf(bufout, sizeof(bufout), fmt, ap);
 	va_end(ap);
 
 	mbsprint(bufout, columns);
@@ -158,11 +154,10 @@ uidisplay(Item *entry)
 	nd = ndigits(nitems);
 
 	for (i = dir->printoff; i < nitems && i < nlines; ++i) {
-		if (snprintf(bufout, sizeof(bufout), "%*zu %s %s",
-		             nd, i+1, typedisplay(items[i].type),
-		             items[i].username)
-		    >= sizeof(bufout))
-			bufout[sizeof(bufout)-1] = '\0';
+		snprintf(bufout, sizeof(bufout), "%*zu %s %s",
+		         nd, i+1,typedisplay(items[i].type),
+		         items[i].username);
+
 		mbsprint(bufout, columns);
 		putchar('\n');
 	}
@@ -173,15 +168,10 @@ uidisplay(Item *entry)
 void
 printuri(Item *item, size_t i)
 {
-	int n;
-
 	if (!item || item->type == 0 || item->type == 'i')
 		return;
 
-	n = itemuri(item, bufout, sizeof(bufout));
-
-	if (n >= sizeof(bufout))
-		bufout[sizeof(bufout)-1] = '\0';
+	itemuri(item, bufout, sizeof(bufout));
 
 	mbsprint(bufout, columns);
 	putchar('\n');
