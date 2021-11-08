@@ -44,19 +44,19 @@ struct dir {
 	size_t curline;
 };
 
-extern void (*diag)(char *fmt, ...);
+extern void (*diag)(char *, ...);
 
-void die(const char *fmt, ...);
-size_t mbsprint(const char *s, size_t len);
+extern void die(const char *, ...);
+extern size_t mbsprint(const char *, size_t);
 #ifdef NEED_STRCASESTR
-char *strcasestr(const char *h, const char *n);
+extern char *strcasestr(const char *, const char *);
 #endif /* NEED_STRCASESTR */
-const char *typedisplay(char t);
-int itemuri(Item *, char *, size_t);
-void uicleanup(void);
-void uidisplay(Item *entry);
-char *uiprompt(char *fmt, ...);
-Item *uiselectitem(Item *entry);
-void uisetup(void);
-void uisigwinch(int signal);
-void uistatus(char *fmt, ...);
+extern const char *typedisplay(char);
+extern int itemuri(Item *, char *, size_t);
+extern void uicleanup(void);
+extern void uidisplay(Item *);
+extern char *uiprompt(char *, ...);
+extern Item *uiselectitem(Item *);
+extern void uisetup(void);
+extern void uisigwinch(int);
+extern void uistatus(char *, ...);
