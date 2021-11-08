@@ -12,8 +12,8 @@
 
 static char bufout[256];
 static Item *curentry;
+static int lines, columns;
 static char cmd;
-int lines, columns;
 
 static void
 viewsize(int *ln, int *col)
@@ -43,7 +43,7 @@ uicleanup(void)
 	return;
 }
 
-void
+static void
 help(void)
 {
 	puts("Commands:\n"
@@ -165,7 +165,7 @@ uidisplay(Item *entry)
 	fflush(stdout);
 }
 
-void
+static void
 printuri(Item *item, size_t i)
 {
 	if (!item || item->type == 0 || item->type == 'i')
@@ -177,7 +177,7 @@ printuri(Item *item, size_t i)
 	putchar('\n');
 }
 
-void
+static void
 searchinline(const char *searchstr, Item *entry)
 {
 	Dir *dir;

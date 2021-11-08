@@ -372,7 +372,7 @@ jumptoline(Item *entry, ssize_t line, int absolute)
 	return;
 }
 
-void
+static void
 searchinline(const char *searchstr, Item *entry, int pos)
 {
 	Dir *dir;

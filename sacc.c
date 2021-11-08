@@ -22,15 +22,15 @@
 #include "io.h"
 #include "config.h"
 
-const char ident[] = "@(#) sacc(omys): " VERSION;
+void (*diag)(char *, ...);
+
+static const char *ident = "@(#) sacc(omys): " VERSION;
 
 static char *mainurl;
 static Item *mainentry;
 static int devnullfd;
 static int parent = 1;
 static int interactive;
-
-void (*diag)(char *fmt, ...);
 
 static void
 stddiag(char *fmt, ...)
