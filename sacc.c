@@ -265,6 +265,43 @@ typedisplay(char t)
 	}
 }
 
+int
+itemuri(Item *item, char *buf, size_t bsz)
+{
+	int n;
+
+	switch (item->type) {
+	case '8':
+		n = snprintf(buf, bsz, "telnet://%s@%s:%s",
+		             item->selector, item->host, item->port);
+		break;
+	case 'T':
+		n = snprintf(buf, bsz, "tn3270://%s@%s:%s",
+		             item->selector, item->host, item->port);
+		break;
+	case 'h':
+		n = snprintf(buf, bsz, "%s", item->selector +
+		             (strncmp(item->selector, "URL:", 4) ? 0 : 4));
+		break;
+	default:
+		n = snprintf(buf, bsz, "gopher://%s", item->host);
+
+		if (n < bsz-1 && strcmp(item->port, "70"))
+			n += snprintf(buf+n, bsz-n, ":%s", item->port);
+		if (n < bsz-1) {
+			n += snprintf(buf+n, bsz-n, "/%c%s",
+			              item->type, item->selector);
+		}
+		if (n < bsz-1 && item->type == '7' && item->tag) {
+			n += snprintf(buf+n, bsz-n, "%%09%s",
+			              item->tag + strlen(item->selector));
+		}
+		break;
+	}
+
+	return n;
+}
+
 static void
 printdir(Item *item)
 {

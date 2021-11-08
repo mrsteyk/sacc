@@ -45,12 +45,14 @@ struct dir {
 };
 
 extern void (*diag)(char *fmt, ...);
+
 void die(const char *fmt, ...);
 size_t mbsprint(const char *s, size_t len);
 #ifdef NEED_STRCASESTR
 char *strcasestr(const char *h, const char *n);
 #endif /* NEED_STRCASESTR */
 const char *typedisplay(char t);
+int itemuri(Item *, char *, size_t);
 void uicleanup(void);
 void uidisplay(Item *entry);
 char *uiprompt(char *fmt, ...);

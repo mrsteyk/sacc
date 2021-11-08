@@ -175,53 +175,10 @@ printuri(Item *item, size_t i)
 {
 	int n;
 
-	if (!item)
+	if (!item || item->type == 0 || item->type == 'i')
 		return;
 
-	switch (item->type) {
-	case 0:
-		return;
-	case '8':
-		n = snprintf(bufout, sizeof(bufout), "telnet://%s@%s:%s",
-		             item->selector, item->host, item->port);
-		break;
-	case 'i':
-		n = snprintf(bufout, sizeof(bufout), "%zu: %s",
-		             i, item->username);
-		break;
-	case 'h':
-		n = snprintf(bufout, sizeof(bufout), "%zu: %s: %s",
-		         i, item->username, item->selector);
-		break;
-	case 'T':
-		n = snprintf(bufout, sizeof(bufout), "tn3270://%s@%s:%s",
-		             item->selector, item->host, item->port);
-		break;
-	default:
-		n = snprintf(bufout, sizeof(bufout), "%zu: ", i);
-
-		if (n < sizeof(bufout) && *item->username) {
-			n += snprintf(bufout+n, sizeof(bufout)-n, "%s: ",
-			              item->username);
-		}
-		if (n < sizeof(bufout)) {
-			n += snprintf(bufout+n, sizeof(bufout)-n, "gopher://%s",
-			              item->host);
-		}
-		if (n < sizeof(bufout) && strcmp(item->port, "70")) {
-			n += snprintf(bufout+n, sizeof(bufout)-n, ":%s",
-			              item->port);
-		}
-		if (n < sizeof(bufout)) {
-			n += snprintf(bufout+n, sizeof(bufout)-n, "/%c%s",
-			              item->type, item->selector);
-		}
-		if (n < sizeof(bufout) && item->type == '7' && item->tag) {
-			n += snprintf(bufout+n, sizeof(bufout)-n, "%%09%s",
-			              item->tag + strlen(item->selector));
-		}
-		break;
-	}
+	n = itemuri(item, bufout, sizeof(bufout));
 
 	if (n >= sizeof(bufout))
 		bufout[sizeof(bufout)-1] = '\0';

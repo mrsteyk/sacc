@@ -219,36 +219,8 @@ displayuri(Item *item)
 
 	putp(tparm(cursor_address, lines-1, 0, 0, 0, 0, 0, 0, 0, 0));
 	putp(tparm(enter_standout_mode, 0, 0, 0, 0, 0, 0, 0, 0, 0));
-	switch (item->type) {
-	case '8':
-		n = snprintf(bufout, sizeof(bufout), "telnet://%s@%s:%s",
-		             item->selector, item->host, item->port);
-		break;
-	case 'h':
-		n = snprintf(bufout, sizeof(bufout), "%s",
-		             item->selector);
-		break;
-	case 'T':
-		n = snprintf(bufout, sizeof(bufout), "tn3270://%s@%s:%s",
-		             item->selector, item->host, item->port);
-		break;
-	default:
-		n = snprintf(bufout, sizeof(bufout), "gopher://%s", item->host);
 
-		if (n < sizeof(bufout) && strcmp(item->port, "70")) {
-			n += snprintf(bufout+n, sizeof(bufout)-n, ":%s",
-			              item->port);
-		}
-		if (n < sizeof(bufout)) {
-			n += snprintf(bufout+n, sizeof(bufout)-n, "/%c%s",
-			              item->type, item->selector);
-		}
-		if (n < sizeof(bufout) && item->type == '7' && item->tag) {
-			n += snprintf(bufout+n, sizeof(bufout)-n, "%%09%s",
-			              item->tag + strlen(item->selector));
-		}
-		break;
-	}
+	itemuri(item, bufout, sizeof(bufout));
 
 	if (n >= sizeof(bufout))
 		bufout[sizeof(bufout)-1] = '\0';
