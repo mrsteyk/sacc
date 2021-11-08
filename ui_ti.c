@@ -505,7 +505,6 @@ uiselectitem(Item *entry)
 			jumptoline(entry, 0, 0);
 			continue;
 		case _key_search:
-		search:
 			free(searchstr);
 			if (!((searchstr = uiprompt("Search for: ")) &&
 			    searchstr[0])) {
@@ -523,7 +522,6 @@ uiselectitem(Item *entry)
 		quit:
 			return NULL;
 		case _key_fetch:
-		fetch:
 			if (entry->raw)
 				continue;
 			return entry;

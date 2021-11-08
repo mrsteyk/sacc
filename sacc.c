@@ -419,14 +419,13 @@ static Dir *
 molddiritem(char *raw)
 {
 	Item *item, *items = NULL;
-	char *s, *nl, *p;
+	char *nl, *p;
 	Dir *dir;
 	size_t i, n, nitems;
 
-	for (s = nl = raw, nitems = 0; p = strchr(nl, '\n'); ++nitems) {
-		s = nl;
-		nl = p+1;
-	}
+	for (nl = raw, nitems = 0; p = strchr(nl, '\n'); nl = p+1)
+		++nitems;
+
 	if (!nitems) {
 		diag("Couldn't parse dir item");
 		return NULL;
@@ -531,7 +530,7 @@ connectto(const char *host, const char *port, struct cnx *c)
 	    .ai_protocol = IPPROTO_TCP,
 	};
 	struct addrinfo *addrs, *ai;
-	int r, err, conn;
+	int r, err;
 
 	sigemptyset(&set);
 	sigaddset(&set, SIGWINCH);
