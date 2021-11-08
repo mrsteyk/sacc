@@ -20,7 +20,9 @@
 
 #include "common.h"
 #include "io.h"
+#define NEED_CONF
 #include "config.h"
+#undef NEED_CONF
 
 void (*diag)(char *, ...);
 

@@ -20,6 +20,8 @@
 #define _key_searchnext	'n' /* search same string forward */
 #define _key_searchprev	'N' /* search same string backward */
 
+#ifdef NEED_CONF
+
 /* default plumber */
 static char *plumber = "xdg-open";
 
@@ -50,3 +52,5 @@ static char *typestr[] = {
 	[UNK] = " ? +",
 	[BRK] = "!  |", /* malformed entry */
 };
+
+#endif /* NEED_CONF */
