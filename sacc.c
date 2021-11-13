@@ -679,7 +679,7 @@ fetchitem(Item *item)
 }
 
 static void
-plumb(char *url)
+execuri(char *cmd, char *msg, char *uri)
 {
 	switch (fork()) {
 	case -1:
@@ -689,7 +689,7 @@ plumb(char *url)
 		parent = 0;
 		dup2(devnullfd, 1);
 		dup2(devnullfd, 2);
-		if (execlp(plumber, plumber, url, NULL) == -1)
+		if (execlp(cmd, cmd, uri, NULL) == -1)
 			_exit(1);
 	default:
 		if (modalplumber) {
@@ -698,7 +698,7 @@ plumb(char *url)
 		}
 	}
 
-	diag("Plumbed \"%s\"", url);
+	diag("%s \"%s\"", msg, uri);
 }
 
 static void
@@ -749,7 +749,7 @@ plumbitem(Item *item)
 		item->tag = path;
 
 	if (plumbitem)
-		plumb(item->tag);
+		execuri(plumber, "Plumbed", item->tag);
 
 	return;
 cleanup:
@@ -772,7 +772,7 @@ dig(Item *entry, Item *item)
 	switch (t) {
 	case 'h': /* fallthrough */
 		if (!strncmp(item->selector, "URL:", 4)) {
-			plumb(item->selector+4);
+			execuri(plumber, "Plumbed", item->selector+4);
 			return 0;
 		}
 	case '0':
@@ -795,7 +795,7 @@ dig(Item *entry, Item *item)
 		             item->selector, item->selector ? "@" : "",
 		             item->host, item->port) == -1)
 			return 0;
-		plumb(plumburi);
+		execuri(plumber, "Plumbed", plumburi);
 		free(plumburi);
 		return 0;
 	case 'T':
@@ -803,7 +803,7 @@ dig(Item *entry, Item *item)
 		             item->selector, item->selector ? "@" : "",
 		             item->host, item->port) == -1)
 			return 0;
-		plumb(plumburi);
+		execuri(plumburi, "Plumbed", plumburi);
 		free(plumburi);
 		return 0;
 	default:
