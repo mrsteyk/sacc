@@ -55,6 +55,8 @@ help(void)
 	     "p: show previous page.\n"
 	     "t: go to the top of the page\n"
 	     "b: go to the bottom of the page\n"
+	     "Y: yank page URI.\n"
+	     "y#: yank item number # URI.\n"
 	     "/str: search for string \"str\"\n"
 	     "!: refetch failed item.\n"
 	     "^D, q: quit.\n"
@@ -271,6 +273,12 @@ uiselectitem(Item *entry)
 			if (item > 0 && item <= nitems)
 				printuri(&dir->items[item-1], item);
 			continue;
+		case 'Y':
+			yankitem(entry);
+			continue;
+		case 'y':
+			if (item > 0 && item <= nitems)
+				yankitem(&dir->items[item-1]);
 		case '/':
 			if (*sstr)
 				searchinline(sstr, entry);

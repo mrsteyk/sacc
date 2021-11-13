@@ -28,6 +28,7 @@ void (*diag)(char *, ...);
 
 static const char *ident = "@(#) sacc(omys): " VERSION;
 
+static char intbuf[256]; /* 256B ought to be enough for any URI */
 static char *mainurl;
 static Item *mainentry;
 static int devnullfd;
@@ -679,6 +680,21 @@ fetchitem(Item *item)
 }
 
 static void
+pipeuri(char *cmd, char *msg, char *uri)
+{
+	FILE *sel;
+
+	if ((sel = popen(cmd, "w")) == NULL) {
+		diag("URI not %s\n", msg);
+		return;
+	}
+
+	fputs(uri, sel);
+	pclose(sel);
+	diag("%s \"%s\"", msg, uri);
+}
+
+static void
 execuri(char *cmd, char *msg, char *uri)
 {
 	switch (fork()) {
@@ -755,6 +771,13 @@ plumbitem(Item *item)
 cleanup:
 	free(path);
 	return;
+}
+
+void
+yankitem(Item *item)
+{
+	itemuri(item, intbuf, sizeof(intbuf));
+	pipeuri(yanker, "Yanked", intbuf);
 }
 
 static int

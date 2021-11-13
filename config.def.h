@@ -13,6 +13,8 @@
 #define _key_pgprev	'h' /* view previous item */
 #define _key_cururi	'U' /* print page uri */
 #define _key_seluri	'u' /* print item uri */
+#define _key_yankcur	'Y' /* yank page uri */
+#define _key_yanksel	'y' /* yank item uri */
 #define _key_fetch	'L' /* refetch current item */
 #define _key_help	'?' /* display help */
 #define _key_quit	'q' /* exit sacc */
@@ -21,6 +23,9 @@
 #define _key_searchprev	'N' /* search same string backward */
 
 #ifdef NEED_CONF
+
+/* default yanker */
+static char *yanker = "xclip";
 
 /* default plumber */
 static char *plumber = "xdg-open";

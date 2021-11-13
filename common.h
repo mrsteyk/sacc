@@ -53,6 +53,7 @@ extern char *strcasestr(const char *, const char *);
 #endif /* NEED_STRCASESTR */
 extern const char *typedisplay(char);
 extern int itemuri(Item *, char *, size_t);
+extern void yankitem(Item *);
 extern void uicleanup(void);
 extern void uidisplay(Item *);
 extern char *uiprompt(char *, ...);

@@ -138,6 +138,8 @@ help(Item *entry)
 		       S(_key_searchprev) ": search string backward.\n"
 		       S(_key_cururi) ": print page URI.\n"
 		       S(_key_seluri) ": print item URI.\n"
+		       S(_key_yankcur) ": yank page URI to external program.\n"
+		       S(_key_yanksel) ": yank item URI to external program.\n"
 		       S(_key_help) ": show this help.\n"
 		       "^D, " S(_key_quit) ": exit sacc.\n"
 	};
@@ -532,6 +534,14 @@ uiselectitem(Item *entry)
 		case _key_seluri:
 			if (dir)
 				displayuri(&dir->items[dir->curline]);
+			continue;
+		case _key_yankcur:
+			if (dir)
+				yankitem(entry);
+			continue;
+		case _key_yanksel:
+			if (dir)
+				yankitem(&dir->items[dir->curline]);
 			continue;
 		case _key_help: /* FALLTHROUGH */
 			return help(entry);
