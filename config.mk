@@ -3,7 +3,7 @@ PREFIX = /usr/local
 MANDIR = $(PREFIX)/share/man/man1
 
 # Version to put in the ident string
-VERSION = "1.04"
+VERSION = "1.05"
 GETVER = $$(git rev-parse --is-inside-work-tree >/dev/null 2>&1 && \
 	    git describe --tags || echo $(VERSION))
 
