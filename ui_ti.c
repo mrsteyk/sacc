@@ -443,18 +443,27 @@ uiselectitem(Item *entry)
 			}
 			c = getchar();
 			switch (c) {
+			case '1':
 			case '4':
 			case '5':
 			case '6':
+			case '7': /* urxvt */
+			case '8': /* urxvt */
 				if (getchar() != '~')
 					continue;
 				switch (c) {
+				case '1':
+					goto home;
 				case '4':
 					goto end;
 				case '5':
 					goto pgup;
 				case '6':
 					goto pgdown;
+				case '7':
+					goto home;
+				case '8':
+					goto end;
 				}
 			case 'A':
 				goto lnup;
