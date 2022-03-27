@@ -1079,6 +1079,9 @@ setup(void)
 	sigaction(SIGHUP, &sa, NULL);
 	sigaction(SIGTERM, &sa, NULL);
 
+	sa.sa_handler = SIG_IGN;
+	sigaction(SIGCHLD, &sa, NULL);
+
 	if (!mkdtemp(tmpdir))
 		die("mkdir: %s: %s", tmpdir, strerror(errno));
 	if (interactive = isatty(1)) {
