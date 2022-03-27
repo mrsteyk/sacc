@@ -576,7 +576,7 @@ static int
 download(Item *item, int dest)
 {
 	char buf[BUFSIZ];
-	struct cnx c;
+	struct cnx c = { 0 };
 	ssize_t r, w;
 
 	if (item->tag == NULL) {
@@ -590,7 +590,6 @@ download(Item *item, int dest)
 			errno = 0;
 			return 0;
 		}
-		c.tls = NULL;
 	}
 
 	w = 0;
