@@ -435,7 +435,8 @@ uiselectitem(Item *entry)
 			switch (getchar()) {
 			case 0x1b:
 				goto quit;
-			case '[':
+			case 'O': /* application key */
+			case '[': /* DEC */
 				break;
 			default:
 				continue;
