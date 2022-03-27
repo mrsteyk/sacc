@@ -424,7 +424,7 @@ uiselectitem(Item *entry)
 {
 	Dir *dir;
 	char *searchstr = NULL;
-	int plines = lines-2;
+	int c, plines = lines-2;
 
 	if (!entry || !(dir = entry->dat))
 		return NULL;
@@ -441,19 +441,21 @@ uiselectitem(Item *entry)
 			default:
 				continue;
 			}
-			switch (getchar()) {
+			c = getchar();
+			switch (c) {
 			case '4':
-				if (getchar() != '~')
-					continue;
-				goto end;
 			case '5':
-				if (getchar() != '~')
-					continue;
-				goto pgup;
 			case '6':
 				if (getchar() != '~')
 					continue;
-				goto pgdown;
+				switch (c) {
+				case '4':
+					goto end;
+				case '5':
+					goto pgup;
+				case '6':
+					goto pgdown;
+				}
 			case 'A':
 				goto lnup;
 			case 'B':
