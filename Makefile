@@ -26,7 +26,7 @@ install: $(BIN)
 	cp -f $(BIN) $(DESTDIR)$(PREFIX)/bin/
 	chmod 555 $(DESTDIR)$(PREFIX)/bin/$(BIN)
 	mkdir -p $(DESTDIR)$(MANDIR)
-	cp -f $(MAN) $(DESTDIR)$(MANDIR)
+	sed -e "s/%VERSION%/$(GETVER)/" $(MAN) > $(DESTDIR)$(MANDIR)/$(MAN)
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/$(BIN) $(DESTDIR)$(MANDIR)/$(MAN)
