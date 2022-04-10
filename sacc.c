@@ -26,7 +26,7 @@
 
 void (*diag)(char *, ...);
 
-static const char *ident = "@(#) sacc(omys): " VERSION;
+const char ident[] = "@(#) sacc(omys): " VERSION;
 
 static char intbuf[256]; /* 256B ought to be enough for any URI */
 static char *mainurl;
