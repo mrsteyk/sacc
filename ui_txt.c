@@ -197,7 +197,7 @@ Item *
 uiselectitem(Item *entry)
 {
 	Dir *dir;
-	char buf[BUFSIZ], *sstr, nl;
+	char buf[BUFSIZ], *sstr = NULL, nl;
 	int item, nitems;
 
 	if (!entry || !(dir = entry->dat))
@@ -281,7 +281,7 @@ uiselectitem(Item *entry)
 				yankitem(&dir->items[item-1]);
 			continue;
 		case '/':
-			if (*sstr)
+			if (sstr && *sstr)
 				searchinline(sstr, entry);
 			continue;
 		case 'h':
