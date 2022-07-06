@@ -279,6 +279,7 @@ uiselectitem(Item *entry)
 		case 'y':
 			if (item > 0 && item <= nitems)
 				yankitem(&dir->items[item-1]);
+			continue;
 		case '/':
 			if (*sstr)
 				searchinline(sstr, entry);
