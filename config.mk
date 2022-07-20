@@ -28,6 +28,9 @@ IOCFLAGS = -DUSE_TLS
 # Linux, OpenBSD
 OSCFLAGS = -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700 -D_BSD_SOURCE -D_GNU_SOURCE
 OSLDFLAGS = 
+# NetBSD, using default pkgsrc path
+#OSCFLAGS = -I/usr/pkg/include
+#OSLDFLAGS = -L/usr/pkg/lib -R/usr/pkg/lib
 # FreeBSD
 #OSCFLAGS = -I/usr/local/include
 #OSLDFLAGS = -L/usr/local/lib
