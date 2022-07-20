@@ -2,6 +2,10 @@
 PREFIX = /usr/local
 MANDIR = $(PREFIX)/share/man/man1
 
+# Default build flags
+CFLAGS = -Os
+LDFLAGS = -s
+
 # Version to put in the ident string
 VERSION = "1.06"
 GETVER = $$(git rev-parse --is-inside-work-tree >/dev/null 2>&1 && \
