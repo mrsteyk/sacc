@@ -21,6 +21,28 @@
 #include "version.h"
 #include "common.h"
 #include "io.h"
+
+enum {
+	TXT,
+	DIR,
+	CSO,
+	ERR,
+	MAC,
+	DOS,
+	UUE,
+	IND,
+	TLN,
+	BIN,
+	MIR,
+	IBM,
+	GIF,
+	IMG,
+	URL,
+	INF,
+	UNK,
+	BRK,
+};
+
 #define NEED_CONF
 #include "config.h"
 #undef NEED_CONF
