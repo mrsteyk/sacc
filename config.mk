@@ -22,6 +22,14 @@ IO = tls
 IOLIBS = -ltls
 IOCFLAGS = -DUSE_TLS
 
-# Define NEED_ASPRINTF and/or NEED_STRCASESTR in your cflags if your system does
-# not provide asprintf() or strcasestr(), respectively.
-#CFLAGS = -DNEED_ASPRINTF -DNEED_STRCASESTR
+# OS compilation flags are used to expose the system interfaces
+# Linux, OpenBSD
+OSCFLAGS = -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700 -D_BSD_SOURCE -D_GNU_SOURCE
+OSLDFLAGS = 
+# FreeBSD
+#OSCFLAGS = -I/usr/local/include
+#OSLDFLAGS = -L/usr/local/lib
+
+# Define NEED_ASPRINTF and/or NEED_STRCASESTR in your OS compilation flags
+# if your system does not provide asprintf() or strcasestr(), respectively.
+#OSCFLAGS = -DNEED_ASPRINTF -DNEED_STRCASESTR
