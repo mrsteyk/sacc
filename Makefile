@@ -8,21 +8,28 @@ BIN = sacc
 MAN = $(BIN).1
 OBJ = $(BIN:=.o) ui_$(UI).o io_$(IO).o
 
+GETVER = $$(git rev-parse --is-inside-work-tree >/dev/null 2>&1 \
+	&& git describe --tags \
+	|| echo $(DEFVERSION))
+
 all: $(BIN)
 
 config.h:
 	cp config.def.h config.h
 
+version.h: .git/refs/heads/
+	printf '#define VERSION "%s"\n' "$(GETVER)" > $@
+
 $(BIN): $(OBJ)
 	$(CC) $(SACCLDFLAGS) -o $@ $(OBJ) $(IOLIBS) $(LIBS)
 
 $(OBJ): config.mk common.h
-sacc.o: config.h
+sacc.o: config.h version.h
 ui_ti.o: config.h
 io_$(IO).o: io.h
 
 clean:
-	rm -f $(BIN) $(OBJ)
+	rm -f $(BIN) $(OBJ) version.h
 
 install: $(BIN)
 	mkdir -p $(DESTDIR)$(PREFIX)/bin/
@@ -36,12 +43,13 @@ uninstall:
 
 # Stock FLAGS
 SACCCFLAGS = $(OSCFLAGS) \
-             -DVERSION=\"$(GETVER)\" \
              $(IOCFLAGS) \
              $(CFLAGS) \
 
 SACCLDFLAGS = $(OSLDFLAGS) \
 	      $(LDFLAGS) \
+
+.git/refs/heads/:
 
 .c.o:
 	$(CC) $(SACCCFLAGS) -c $<

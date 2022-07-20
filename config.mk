@@ -6,10 +6,8 @@ MANDIR = $(PREFIX)/share/man/man1
 CFLAGS = -Os
 LDFLAGS = -s
 
-# Version to put in the ident string
-VERSION = "1.06"
-GETVER = $$(git rev-parse --is-inside-work-tree >/dev/null 2>&1 && \
-	    git describe --tags || echo $(VERSION))
+# Default version to put in the ident string
+DEFVERSION = "1.06"
 
 # UI type
 # txt (textual)

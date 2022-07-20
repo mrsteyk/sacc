@@ -18,6 +18,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+#include "version.h"
 #include "common.h"
 #include "io.h"
 #define NEED_CONF
