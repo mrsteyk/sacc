@@ -16,7 +16,10 @@ config.h:
 $(BIN): $(OBJ)
 	$(CC) $(SACCLDFLAGS) -o $@ $(OBJ) $(IOLIBS) $(LIBS)
 
-$(OBJ): config.h config.mk common.h io.h
+$(OBJ): config.mk common.h
+sacc.o: config.h
+ui_ti.o: config.h
+io_$(IO).o: io.h
 
 clean:
 	rm -f $(BIN) $(OBJ)
