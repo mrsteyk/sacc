@@ -25,7 +25,7 @@
 #ifdef NEED_CONF
 
 /* default yanker */
-static char *yanker = "xclip";
+static char *yanker = "wl-copy -n";
 
 /* default plumber */
 static char *plumber = "xdg-open";
