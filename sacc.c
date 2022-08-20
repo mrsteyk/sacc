@@ -1083,7 +1083,7 @@ setup(void)
 	int fd;
 
 	setlocale(LC_CTYPE, "");
-	setenv("PAGER", "more", 0);
+	setenv("PAGER", pager, 0);
 	atexit(cleanup);
 	/* reopen stdin in case we're reading from a pipe */
 	if ((fd = open("/dev/tty", O_RDONLY)) == -1)

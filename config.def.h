@@ -24,6 +24,9 @@
 
 #ifdef NEED_CONF
 
+/* default pager */
+static char *pager = "more";
+
 /* default yanker */
 static char *yanker = "xclip";
 
